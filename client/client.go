@@ -5,25 +5,23 @@ import (
 	"encoding/json"
 	"log"
 	"net"
+	"os"
 )
 
-type RequestInt struct {
-	Tipo string `json:"tipo"`
-	Val  int    `json:"val"`
-}
-
-type RequestChar struct {
-	Tipo string `json:"tipo"`
-	Val  byte   `json:"val"`
-}
-
-type RequestString struct {
+type Request struct {
 	Tipo string `json:"tipo"`
 	Val  string `json:"val"`
 }
 
 func main() {
-	server := "127.0.0.1:9922"
+	if len(os.Args) != 4 {
+		log.Fatal("Execute o Cliente com o comando 'go run client.go 127.0.0.1:9922 int 68'")
+	}
+
+	server := os.Args[1]
+	tipo := os.Args[2]
+	val := os.Args[3]
+
 	log.Print("Conectando ao servidor: ", server)
 	buf := make([]byte, 8192)
 	conn, err := net.Dial("udp", server)
@@ -34,9 +32,7 @@ func main() {
 
 	defer conn.Close()
 
-	// request := &RequestInt{"int", 68}
-	// request := &RequestString{"string", "Request"}
-	request := &RequestChar{"char", 'R'}
+	request := &Request{tipo, val}
 
 	jsonRequest, err := json.Marshal(request)
 	if err != nil {
