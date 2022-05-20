@@ -3,14 +3,23 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net"
 	"os"
+	"time"
 )
 
 type Request struct {
 	Tipo string `json:"tipo"`
 	Val  string `json:"val"`
+}
+
+func elapsed(what string) func() {
+	start := time.Now()
+	return func() {
+		fmt.Printf("%s levou %v\n", what, time.Since(start))
+	}
 }
 
 func main() {
@@ -23,6 +32,7 @@ func main() {
 	val := os.Args[3]
 
 	log.Print("Conectando ao servidor: ", server)
+	defer elapsed("Requisição")()
 	buf := make([]byte, 8192)
 	conn, err := net.Dial("udp", server)
 	if err != nil {
